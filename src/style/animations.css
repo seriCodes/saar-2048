@@ -1,0 +1,48 @@
+/* @-webkit-keyframes  moveLeft{
+    to {top: 200px;}
+} */
+  
+.moveLeftClass{
+    animation-name: moveLeft;
+    animation-duration:0.2s;
+    /* animation-duration: var(--animation-duration); dosen't work*/
+    position: relative;
+    animation-fill-mode: forwards;/*makes the animation stay at end position intil a new render by setState*/
+    
+}
+
+@keyframes moveLeft {
+    0%   { right:0px; top:0px;}
+    100%  { right:98px; top:0px;}
+    
+} 
+
+.moveRightClass{
+    animation-name: moveright;
+    animation-duration: 1s;
+    position: relative;
+}
+@keyframes moveright {
+    0%   { left:0px; top:0px;}
+    25%  { left:98px; top:0px;}
+} 
+.moveUpClass{
+    animation-name: moveUp;
+    animation-duration: 1s;
+    position: relative;
+}
+@keyframes moveUp {
+    0%   { left:0px; bottom:0px;}
+    25%  { left:0px; bottom:82px;}
+} 
+
+
+.moveDownClass{
+    animation-name: movedown;
+    animation-duration: 1s;
+    position: relative;
+}
+@keyframes movedown {
+    0%   { left:0px; top:0px;}
+    25%  { left:0px; top:82px;}
+} 

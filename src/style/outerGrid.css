@@ -1,0 +1,29 @@
+.tile{
+    background-color:rgba(238, 228, 218, 0.35);
+    /* background-color: #faf8ef; */
+    border:33px solid black;
+    /* box-sizing: border-box; */
+padding: 0;
+  height: 75px;
+  margin-left: 0.5em;
+  margin-bottom: 0.02em;
+
+
+}
+.gridStyle{
+ 
+    /* border:3px solid red */
+
+}
+
+.game-container {
+    margin-top: 90px;
+    position: relative;
+    padding: 20px;
+    cursor: default;
+    /* padding-right:  0px;
+    padding-left: 0px; */
+
+    background: #bbada0;
+
+}
