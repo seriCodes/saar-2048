@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from "react";
 import { gameArray } from "../logic/array";
-import {slideTileInbrowser, makeArrayObjectsPositionStaticId, isLose,render,makeMove,resetIsMergedThisTurn ,isWon,add2or4toArray,deleteIsNew,removeAnimationClassesFromAllElements} from "../logic/functions";
+import {slideTileInbrowser, makeArrayObjectsPositionStaticId, isLose,render,makeMove,resetIsMergedThisTurn ,isWon,add2or4toArray,deleteIsNew,removeAnimationClassesFromAllElements,comparePrevArrayToGameArrayAndRenderAnimation,getElementXYposition, saveCopyPreviousArray} from "../logic/functions";
 import { motion} from "framer-motion";
 import { Tile2} from "../components/Tile2";
 // import "../style";
@@ -10,31 +10,16 @@ import { MyComponent } from "./MotionPlay";
 import "../style/animations.css";
 
 
-
-// document.onkeydown = function() {
-//     console.log(window.event.keyCode)
-//     if((/(37|38|39|40)/).exec(  window.event.keyCode) ){
-   
-//     // if((window.event.keyCode+"").exec(/(37|38|39|40)/) ){
-//       makeMove(window.event.keyCode)
-
-//    }
-//        else{
-//         alert("press an arrow")
-//        }
-// };
-
-let enableEvents=false;//Prevents from firing more than one event simultanously . must be outside the component for not reinitialized after every new render.
+let enableEvents=false;//Prevents from firing more than one event simultanously . must be outside the component for NOT reinitialized after every new render. Makes CLOSURE.
 let atLeastOneMAkeMovewasSuccessful=null
 let keyCode=null
+
 let newRender0=null
-
 let newRender1=null
-
 let newRender2=null
 let newRender3=null
 let newRender4=null
-let useEffectTimeForSetTimeout= 110
+let useEffectTimeForSetTimeout= 100
 let isInitialRendering=true
 
 console.log("enableEvents BEFORE the START of the component",enableEvents)
@@ -52,16 +37,22 @@ export const OuterGrid = () => {
         enableEvents=true
         isInitialRendering=false
 
+        // getElementXYposition("00")
+        // getElementXYposition("22")
+
+
         add2or4toArray()
         add2or4toArray()
-    
+        
         makeArrayObjectsPositionStaticId()
         setNewRenderGeneral(!newRenderGeneral)
+
+        saveCopyPreviousArray("initialization useEffect")
 
         // deleteIsNew()//no need b/c makeMove() doesn't copy isNew property
 
 
-}, useEffectTimeForSetTimeout*0.25);
+}, useEffectTimeForSetTimeout*1.25);
       return () => clearTimeout(timer);
     }, []);
 
@@ -79,7 +70,7 @@ export const OuterGrid = () => {
     const[newRenderGeneral,setNewRenderGeneral]=useState(true)
        
 /////input keyboard events////////
-    document.onkeydown = function() {
+document.onkeydown = function() {
       // console.log(window.event.keyCode)
       // console.log("enableEvents in document.onkeydown OUTSIDE if", enableEvents)
 
@@ -107,7 +98,7 @@ if((/(37|38|39|40)/).exec(  window.event.keyCode) ){
 }
 
     }
-    /////first movement////////
+    /////ALL movement////////
 useEffect(() => {
   console.log("enableEvents in 1 movement useEffect (fire twice: initial rendering and newRender-0- state change):",enableEvents)
 
@@ -121,12 +112,21 @@ useEffect(() => {
 
   if(didMakeMove){//prevents from making a new tile when not moving
     
+
+    makeMove(keyCode,2)
+    makeMove(keyCode,3)
+
+comparePrevArrayToGameArrayAndRenderAnimation()
+
+
     timer = setTimeout(() => {
       console.log('0 movement-This will run after useEffectTimeForSetTimeout !')
 
 
   console.log('inside if(didMakeMove)didMakeMove is', didMakeMove)
 console.log('newRender1 before', newRender1)
+
+
 
     newRender1=!newRender1
 
@@ -135,9 +135,12 @@ console.log('newRender1 before', newRender1)
     console.log('newRender1 AFTER' ,newRender1)
 
     ////removeAnimationClassesFromAllElements()
-  removeAnimationClassesFromAllElements()
+  // removeAnimationClassesFromAllElements()
 
+
+  ////from here go straight to new array render-9.6
     setNewRenderGeneral(!newRenderGeneral)
+
 
 
 }, useEffectTimeForSetTimeout);
@@ -152,108 +155,10 @@ console.log('newRender1 before', newRender1)
     return () => clearTimeout(timer);
   }, [newRender0]);
 
+////end all moves useEffect
+//////////////////////////////////////
 
-    ////second movement
-    useEffect(() => {
-      console.log("enableEvents in second movement useEffect (fire twice: initial rendering and newRender-1- state change):",enableEvents)
-
-      let isMakeNoveWasMade
-      isMakeNoveWasMade=  makeMove(keyCode,2)
-
-      let timer
-
-      if(isMakeNoveWasMade){
-        timer = setTimeout(() => {
-          console.log('second movement-This will run after useEffectTimeForSetTimeout second!')
-
-          newRender2= !newRender2
-
-          ////removeAnimationClassesFromAllElements()
-  removeAnimationClassesFromAllElements()
-
-          setNewRenderGeneral(!newRenderGeneral)
-
-        }, useEffectTimeForSetTimeout);
-      }else if(atLeastOneMAkeMovewasSuccessful){
-        timer = setTimeout(() => {
-          console.log('second movement-was NOT successful. go directly to useEffect for end of play ')
-
-          newRender3=!newRender3
-
-          ////removeAnimationClassesFromAllElements()
-  removeAnimationClassesFromAllElements()
-
-          setNewRenderGeneral(!newRenderGeneral)
-
-        }, useEffectTimeForSetTimeout);
-      }
-        
-
-        return () => clearTimeout(timer);
-
-      }, [newRender1]);
-      
-    ////3 movement//////////////////
-    useEffect(() => {
-              console.log("enableEvents in third movement useEffect (fire twice: initial rendering and newRender-2- state change):",enableEvents)
-        
-        
-        let isMakeNoveWasMade
-
-        isMakeNoveWasMade=  makeMove(keyCode,3)
-
-        console.log('isMakeNoveWasMade in 3 movement', isMakeNoveWasMade)
-
-        let timer
-        if(isMakeNoveWasMade){
-          timer =  setTimeout(() => {
-            console.log('3 movement -This will run after useEffectTimeForSetTimeout second!')
-            console.log('before makeMove 3 keyCode is',keyCode )
-  
-            console.log('after makeMove 3')
-  
-            // setNewRender3(!newRender3)
-            console.log('newRender3', newRender3)
-
-            newRender3=!newRender3
-
-            // removeAnimationClassesFromAllElements()
-
-            console.log('newRender3', newRender3)
-
-////removeAnimationClassesFromAllElements()
-removeAnimationClassesFromAllElements()
-
-            setNewRenderGeneral(!newRenderGeneral)
-  
-          //   resetIsMergedThisTurn()
-          //   isWon()
-          }, useEffectTimeForSetTimeout*1.3);
-          
-        }else if(atLeastOneMAkeMovewasSuccessful){
-          timer = setTimeout(() => {
-            console.log('3 movement-was NOT successful. go directly to useEffect for end of play ')
-  
-            newRender3=!newRender3
-
-            // removeAnimationClassesFromAllElements()
-
-            ////removeAnimationClassesFromAllElements()
-  removeAnimationClassesFromAllElements()
-
-            setNewRenderGeneral(!newRenderGeneral)
-  
-          }, useEffectTimeForSetTimeout);
-        }
-         
-
-         
-        return () => clearTimeout(timer);
-      }, [newRender2]);
-      
-
-
-      //useEffect for end of play & all possible moves
+////////////////////useEffect for end of play & all possible moves
       useEffect(() => {
         // console.log('before resetIsMergedThisTurn')
         console.log('end of play')
@@ -270,6 +175,8 @@ let timer;
         if(keyCode){//prevent firing at initial rendering without an event
           console.log('end of play if(keyCode) ')
 
+          deleteIsNew()
+
             add2or4toArray()
 
             newRender4=!newRender4
@@ -279,6 +186,7 @@ removeAnimationClassesFromAllElements()
 
             setNewRenderGeneral(!newRenderGeneral)//rerender component with the new 2or4 to be rendered
 
+            saveCopyPreviousArray('end of play')
 
             // setNewRender4(!newRender4)//rerender component with the new 2or4 to be rendered
 
@@ -300,7 +208,109 @@ if(isSetTimeoutForIsLoseActivated){
 
 }
 
-    }, [newRender3]);
+    }, [newRender1]);
+
+
+///////////////////////
+
+    ////second movement
+  //   useEffect(() => {
+  //     console.log("enableEvents in second movement useEffect (fire twice: initial rendering and newRender-1- state change):",enableEvents)
+
+  //     let isMakeNoveWasMade
+  //     isMakeNoveWasMade=  makeMove(keyCode,2)
+
+  //     let timer
+
+  //     if(isMakeNoveWasMade){
+  //       timer = setTimeout(() => {
+  //         console.log('second movement-This will run after useEffectTimeForSetTimeout second!')
+
+  //         newRender2= !newRender2
+
+  //         ////removeAnimationClassesFromAllElements()
+  // removeAnimationClassesFromAllElements()
+
+  //         setNewRenderGeneral(!newRenderGeneral)
+
+  //       }, useEffectTimeForSetTimeout);
+  //     }else if(atLeastOneMAkeMovewasSuccessful){
+  //       timer = setTimeout(() => {
+  //         console.log('second movement-was NOT successful. go directly to useEffect for end of play ')
+
+  //         newRender3=!newRender3
+
+  //         ////removeAnimationClassesFromAllElements()
+  // removeAnimationClassesFromAllElements()
+
+  //         setNewRenderGeneral(!newRenderGeneral)
+
+  //       }, useEffectTimeForSetTimeout);
+  //     }
+  //       return () => clearTimeout(timer);
+
+  //     }, [newRender1]);
+      
+    ////3 movement//////////////////
+//     useEffect(() => {
+//               console.log("enableEvents in third movement useEffect (fire twice: initial rendering and newRender-2- state change):",enableEvents)
+        
+        
+//         let isMakeNoveWasMade
+
+//         isMakeNoveWasMade=  makeMove(keyCode,3)
+
+//         console.log('isMakeNoveWasMade in 3 movement', isMakeNoveWasMade)
+
+//         let timer
+//         if(isMakeNoveWasMade){
+//           timer =  setTimeout(() => {
+//             console.log('3 movement -This will run after useEffectTimeForSetTimeout second!')
+//             console.log('before makeMove 3 keyCode is',keyCode )
+  
+//             console.log('after makeMove 3')
+  
+//             // setNewRender3(!newRender3)
+//             console.log('newRender3', newRender3)
+
+//             newRender3=!newRender3
+
+//             // removeAnimationClassesFromAllElements()
+
+//             console.log('newRender3', newRender3)
+
+// ////removeAnimationClassesFromAllElements()
+// removeAnimationClassesFromAllElements()
+
+//             setNewRenderGeneral(!newRenderGeneral)
+  
+//           //   resetIsMergedThisTurn()
+//           //   isWon()
+//           }, useEffectTimeForSetTimeout*1.3);
+          
+//         }else if(atLeastOneMAkeMovewasSuccessful){
+//           timer = setTimeout(() => {
+//             console.log('3 movement-was NOT successful. go directly to useEffect for end of play ')
+  
+//             newRender3=!newRender3
+
+//             // removeAnimationClassesFromAllElements()
+
+//             ////removeAnimationClassesFromAllElements()
+//   removeAnimationClassesFromAllElements()
+
+//             setNewRenderGeneral(!newRenderGeneral)
+  
+//           }, useEffectTimeForSetTimeout);
+//         }
+         
+
+         
+//         return () => clearTimeout(timer);
+//       }, [newRender2]);
+      
+
+
 
     // useEffect(() => {
 
@@ -314,15 +324,15 @@ if(isSetTimeoutForIsLoseActivated){
   return (
     <div className="container game-container">
       <div className="row mx-0 mb-2 aw-grid gridStyle justify-content-center ">
-         <div id="00" className="col col-1 border  tile border-0 gridStyle  px-0">{render(0, 0)}
+         <div id="00" className="col col-1 border tile border-0 px-0">{render(0, 0)}
         </div>
         
-        <div id="01" className="col col-1 border tile gridStyle border-0 px-0 "  >{render(0, 1)}</div>
-        <div id="02" className="col col-1 border  tile border-0 px-0">{render(0, 2)}</div>
+        <div id="01" className="col col-1 border tile border-0 px-0"  >{render(0, 1)}</div>
+        <div id="02" className="col col-1 border tile border-0 px-0">{render(0, 2)}</div>
         <div id="03" className="col col-1 border tile border-0 px-0" >{render(0, 3)}</div>
       </div>
       <div className="row mx-0 mb-2 aw-grid  justify-content-center">
-        <div id="10" className="col col-1 border  tile border-0 px-0">{render(1, 0)}</div>
+        <div id="10" className="col col-1 border tile border-0 px-0">{render(1, 0)}</div>
         <div id="11" className="col col-1 border tile border-0 px-0">{render(1, 1)}</div>
         <div id="12" className="col col-1 border tile border-0 px-0">{render(1, 2)}</div>
         <div id="13" className="col col-1 border tile border-0 px-0">{render(1, 3)}</div>

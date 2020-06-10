@@ -1,21 +1,17 @@
 import React from 'react'
 import { motion} from "framer-motion";
-import '../style/commonTile.css'
-export const Tile2 = ({renderSpeed,initialScaleProp }) => {
-  // console.log(renderSpeed)
-  return (
-    <div className="commonTile " 
-    style={{ 
-      // width: "100%",
-    height:"100%",
-    // textAlign: 'right'
 
-    // columnFill: "auto"
+export const Tile2 = ({renderSpeed,initialScaleProp }) => {
+  console.log(renderSpeed)
+  console.log(initialScaleProp)
+  return (
+    <div style={{ 
+    height:"100%",
   }}
-  >
- 
+  > 
     <motion.div
-    initial={{ scale: initialScaleProp ,opacity: 1,
+    initial={{ scale: initialScaleProp ,
+      opacity: 1,
         backgroundColor: "#eee4da",
         // textAlign: "center",
         // textAlign: 'center',
@@ -45,7 +41,7 @@ fontSize: '45px',
         // ease: "easeIn"
       }}
     
-    className="commonTile ">
+    >
     2
     </motion.div>
     

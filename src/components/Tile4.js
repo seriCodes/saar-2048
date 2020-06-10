@@ -1,14 +1,18 @@
 import React from 'react'
+
 import { motion} from "framer-motion";
 
-export const Tile4 = ({renderSpeed}) => {
-  // console.log(renderSpeed)
+export const Tile4 = ({renderSpeed, initialScaleProp}) => {
+  console.log(renderSpeed)
+  console.log(initialScaleProp)
+
   return (
     <div style={{ 
     height:"100%",
   }}>
     <motion.div
-    initial={{ scale: 0.5,opacity: 1,
+    initial={{ scale: initialScaleProp,
+    opacity: 1,
         backgroundColor: "#ede0c8" }}
 
         style={{ 
@@ -24,11 +28,12 @@ fontSize: '45px',
     animate={{  scale: 1 }}
     transition={{
         opacity: 1,
+        // scale: 11,
         duration: Number(renderSpeed),
         // ease: "easeIn"
       }}
     
-    className="col ">
+    >
         4
     </motion.div>
     

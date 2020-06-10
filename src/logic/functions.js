@@ -12,7 +12,7 @@ import { Tile512 } from "../components/Tile512";
 import { Tile1024 } from "../components/Tile1024";
 import { Tile2048 } from "../components/Tile2048";
 
-
+var prevArray=[[],[],[],[]]
 
 
 var uniqid = require('uniqid');
@@ -71,27 +71,28 @@ console.log(uniqid())
 //     {value:0,isMergedThisTurn:false}]
 // ]
 
-let gameArray= [ //Start game array
+let gameArray= [ //tests array
+
+    [{value:0,isMergedThisTurn:false,uniqid: ["3","4"]},
+    {value:0,isMergedThisTurn:false},
+        
+        {value:0,isMergedThisTurn:false},
+        {value:0,isMergedThisTurn:false}],
 
     [{value:0,isMergedThisTurn:false},
-        {value:0,isMergedThisTurn:false},
+        {value:0,isMergedThisTurn:false,uniqid: ["6"]},
         {value:0,isMergedThisTurn:false},
         {value:0,isMergedThisTurn:false}],
 
     [{value:0,isMergedThisTurn:false},
         {value:0,isMergedThisTurn:false},
-        {value:0,isMergedThisTurn:false},
-        {value:0,isMergedThisTurn:false}],
-
-    [{value:0,isMergedThisTurn:false},
-        {value:0,isMergedThisTurn:false},
-        {value:0,isMergedThisTurn:false},
+        {value:0,isMergedThisTurn:false,uniqid: ["7"]},
         {value:0,isMergedThisTurn:false}],
 
     [{value:0,isMergedThisTurn:false},
     {value:0,isMergedThisTurn:false},
     {value:0,isMergedThisTurn:false},
-    {value:0,isMergedThisTurn:false}]
+    {value:0,isMergedThisTurn:false,uniqid: ["8"]}]
 ]
 
 // let gameArray= [
@@ -270,6 +271,126 @@ export function slideTileInbrowser(initialPosition,endPosition){
         
         }
 
+
+export function comparePrevArrayToGameArrayAndRenderAnimation(){
+
+    console.log(JSON.stringify(gameArray))    
+    console.log(JSON.stringify(prevArray))
+
+    let currentPosition;
+
+    for(var row=0;row<4;row++){  
+        for(var column=0;column<4;column++){
+            if(prevArray
+                [row][column].value!=0){
+                    currentPosition=getPositionInCurrentArray(prevArray
+                        [row][column].uniqid[0])
+                        // console.log(currentPosition.row+""+currentPosition.column)
+                        makeSlideAnimation(currentPosition,row,column)
+
+            }
+        }
+    }
+
+        }
+ function makeSlideAnimation(currentPosition,initialRow,initialColumn){
+
+    console.log(currentPosition.row+" "+currentPosition.column+" "+initialRow+" "+initialColumn)
+    let parentContainerDiv= document.getElementById(initialRow+""+initialColumn);
+    
+    let divToSlide=parentContainerDiv.children[0]
+
+    console.log(divToSlide)
+    let slideDistance
+    if(currentPosition.row==initialRow){
+                slideDistance = currentPosition.column-initialColumn
+                console.log(slideDistance)
+
+                switch (slideDistance) {
+                  case +3:
+                    divToSlide.classList.add("moveRightThreeTimesClass");
+                    return;
+                  case 2:
+                    divToSlide.classList.add("moveRightTwiceClass");
+                    return;
+                  case 1:
+                    divToSlide.classList.add("moveRightOnceClass");
+                    return;
+
+                  case -3:
+                    divToSlide.classList.add("moveLeftThreeTimesClass");
+                    return;
+                  case -2:
+                    divToSlide.classList.add("moveLeftTwiceClass");
+                    return;
+                  case -1:
+                    console.log("case -1");
+
+                    divToSlide.classList.add("moveLeftOnceClass");
+                    return;
+                  default:
+                    return;
+                }
+            }else{
+                slideDistance = currentPosition.row-initialRow
+                switch (slideDistance) {
+                    case +3:
+                      divToSlide.classList.add("moveDownThreeTimesClass");
+                      return;
+                    case 2:
+                      divToSlide.classList.add("moveDownTwiceClass");
+                      return;
+                    case 1:
+                      divToSlide.classList.add("moveDownOnceClass");
+                      return;
+  
+                    case -3:
+                      divToSlide.classList.add("moveUpThreeTimesClass");
+                      return;
+                    case -2:
+                      divToSlide.classList.add("moveUpTwiceClass");
+                      return;
+                    case -1:
+                      console.log("case -1");
+  
+                      divToSlide.classList.add("moveUpOnceClass");
+                      return;
+                    default:
+                      return;
+                  }
+  
+
+            }
+    
+        
+        }
+
+        function getPositionInCurrentArray(id){
+            for(var row=0;row<4;row++){  
+                for(var column=0;column<4;column++){
+                if(gameArray
+                    [row][column].uniqid && gameArray
+                    [row][column].uniqid.includes(id)){
+                        return {row,column}
+                }
+            }
+        }
+    }
+
+export function getElementXYposition(position){
+    let parentContainerDiv= document.getElementById(position);
+
+    let divToSlide=parentContainerDiv.children[0]
+
+   let data= divToSlide.getBoundingClientRect()
+//    console.log(divToSlide)
+
+   console.log(data.x)    
+   console.log(data.y)
+
+   return {x:data.x, y:data.y }
+}
+
 export function makeArrayCopy(){
     // gameArrayCopy=
 
@@ -298,7 +419,8 @@ let value= choose2or4()
 
 gameArray[arrayPosition[0]][arrayPosition[1]]={value,
     isMergedThisTurn:false,
-isNew:true
+isNew:true,
+uniqid:[uniqid()]
 }
 }
 export function makeMove(keyCode, moveCount_debugPorpuses){
@@ -342,20 +464,38 @@ switch (keyCode) {
    
 
 }
-function assignNumber(row,endColumnPosition,copiedTile,gameArray){
-    gameArray[row][endColumnPosition].value=copiedTile
+function assignNumber(row,endColumnPosition,copiedTileValue,gameArray,copiedTileUniqueId){
+    gameArray[row][endColumnPosition].value=copiedTileValue
+    gameArray[row][endColumnPosition].uniqid= copiedTileUniqueId
 }
 function assignZero(row,column,gameArray){
     gameArray[row][column].value=0
+    delete gameArray[row][column].uniqid
 }
-function assignDoubleNumber(row,endColumnPosition,gameArray){
+
+function assignDoubleNumber(row,column,gameArray,id1,id2){
+    let uniqidArray=[]
+
     console.log(gameArray)
 
-    gameArray[row][endColumnPosition].value=gameArray[row][endColumnPosition].value*2
+    gameArray[row][column].value=gameArray[row][column].value*2
 
-    gameArray[row][endColumnPosition].isMergedThisTurn=true
+    gameArray[row][column].uniqid=[id1[0],id2[0]]
+
+    // gameArray[row][column].uniqid=id1.concat(id2); 
+    // gameArray[row][column].uniqid.push(id1)
+    // gameArray[row][column].uniqid.push(id2)
+    // if(gameArray[row][column].uniqid){//uniqidArray already exist/ use for 8 & above
+    // }else{//use a new uniqidArray = use to form 4 or 8 only
+
+    // }
+    
+
+    gameArray[row][column].isMergedThisTurn=true
     console.log(gameArray)
 }
+
+
 
 
 export function removeAnimationClassesFromAllElements() {
@@ -371,10 +511,25 @@ export function removeAnimationClassesFromAllElements() {
             
             if(parentContainerDiv.children[0]){
                 divToSlide=parentContainerDiv.children[0]
-                divToSlide.classList.remove("moveLeftClass")
-                divToSlide.classList.remove("moveRightClass")
-                divToSlide.classList.remove("moveUpClass")
-                divToSlide.classList.remove("moveDownClass")
+                divToSlide.classList.remove("moveLeftOnceClass")
+                divToSlide.classList.remove("moveLeftTwiceClass")
+                divToSlide.classList.remove("moveLeftThreeTimesClass")
+
+
+                divToSlide.classList.remove("moveRightOnceClass")
+                divToSlide.classList.remove("moveRightTwiceClass")
+                divToSlide.classList.remove("moveRightThreeTimesClass")
+
+                divToSlide.classList.remove("moveUpOnceClass")
+                divToSlide.classList.remove("moveUpTwiceClass")
+                divToSlide.classList.remove("moveUpThreeTimesClass")
+
+                divToSlide.classList.remove("moveDownOnceClass")
+                divToSlide.classList.remove("moveDownTwiceClass")
+                divToSlide.classList.remove("moveDownThreeTimesClass")
+
+
+
             }
             
         }
@@ -389,18 +544,22 @@ let madeMove=false
     // let endRowPosition
     let endColumnPosition
 
-    console.log(keyCode)
+    let numberID;
+
+        console.log(keyCode)
     for(var row=0;row<4;row++){  
         for(var column=0;column<4;column++){
             endColumnPosition=column+relativeColumnIndex
+
+            numberID=gameArray[row][column].uniqid
 
            if(endColumnPosition<0||endColumnPosition>3 ||
             gameArray[row][column].value==0){
                continue;
 
            }else if(gameArray[row][endColumnPosition].value==0){            
-            assignNumber(row,endColumnPosition,gameArray[row][column].value,gameArray)
-            slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
+            assignNumber(row,endColumnPosition,gameArray[row][column].value,gameArray,numberID)
+            // slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
             assignZero(row,column,gameArray)
             console.log(gameArray)
 
@@ -411,9 +570,9 @@ let madeMove=false
                 gameArray[row][endColumnPosition].isMergedThisTurn==false &&
                 gameArray[row][column].isMergedThisTurn==false ){
 
-                assignDoubleNumber(row,endColumnPosition,gameArray)
+                assignDoubleNumber(row,endColumnPosition,gameArray,gameArray[row][endColumnPosition].uniqid,gameArray[row][column].uniqid)
                 
-                slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
+                // slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
 
 
                 assignZero(row,column,gameArray)
@@ -528,11 +687,15 @@ export function makeUp(keyCode ,moveCount_debugPorpuses){
         
     let endRowPosition
 
-    
+    let numberID;
+
     console.log(keyCode)
  for(var row=0;row<4;row++){  
         for(var column=0;column<4;column++){
             endRowPosition=row+relativeRowIndex
+            
+            numberID=gameArray[row][column].uniqid
+
 
            if(endRowPosition<0||endRowPosition>3 ||
             gameArray[row][column].value==0){
@@ -540,9 +703,9 @@ export function makeUp(keyCode ,moveCount_debugPorpuses){
 
            }else if(gameArray[endRowPosition][column].value==0){   
                         
-            assignNumber(endRowPosition,column,gameArray[row][column].value,gameArray)
+            assignNumber(endRowPosition,column,gameArray[row][column].value,gameArray,numberID)
 
-            slideTileInbrowser(row+""+column,endRowPosition+""+ column)
+            // slideTileInbrowser(row+""+column,endRowPosition+""+ column)
 
             assignZero(row,column,gameArray)
 
@@ -556,9 +719,9 @@ export function makeUp(keyCode ,moveCount_debugPorpuses){
                 gameArray[endRowPosition][column].isMergedThisTurn==false &&
                 gameArray[row][column].isMergedThisTurn==false ){
 
-                assignDoubleNumber(endRowPosition,column,gameArray)
+                assignDoubleNumber(endRowPosition,column,gameArray,gameArray[endRowPosition][column].uniqid,gameArray[row][column].uniqid)
                 
-                slideTileInbrowser(row+""+column,endRowPosition+""+ column)
+                // slideTileInbrowser(row+""+column,endRowPosition+""+ column)
 
 
                 assignZero(row,column,gameArray)
@@ -593,6 +756,7 @@ export function makeDown(keyCode,moveCount_debugPorpuses){
     let madeMove=false
         
     let endRowPosition
+    let numberID;
 
     
     console.log(keyCode)
@@ -600,15 +764,18 @@ export function makeDown(keyCode,moveCount_debugPorpuses){
         for(var column=3;column>-1;column--){
             endRowPosition=row+relativeRowIndex
 
+            numberID=gameArray[row][column].uniqid
+
+
            if(endRowPosition<0||endRowPosition>3 ||
             gameArray[row][column].value==0){
                continue;
 
            }else if(gameArray[endRowPosition][column].value==0){   
                         
-            assignNumber(endRowPosition,column,gameArray[row][column].value,gameArray)
+            assignNumber(endRowPosition,column,gameArray[row][column].value,gameArray,numberID)
 
-            slideTileInbrowser(row+""+column,endRowPosition+""+ column)
+            // slideTileInbrowser(row+""+column,endRowPosition+""+ column)
 
             assignZero(row,column,gameArray)
 
@@ -622,9 +789,9 @@ export function makeDown(keyCode,moveCount_debugPorpuses){
                 gameArray[endRowPosition][column].isMergedThisTurn==false &&
                 gameArray[row][column].isMergedThisTurn==false ){
 
-                assignDoubleNumber(endRowPosition,column,gameArray)
+                assignDoubleNumber(endRowPosition,column,gameArray,gameArray[endRowPosition][column].uniqid,gameArray[row][column].uniqid)
                 
-                slideTileInbrowser(row+""+column,endRowPosition+""+ column)
+                // slideTileInbrowser(row+""+column,endRowPosition+""+ column)
 
 
                 assignZero(row,column,gameArray)
@@ -659,19 +826,22 @@ export function makeRight(keyCode,moveCount_debugPorpuses){
  let madeMove=false
      // let endRowPosition
      let endColumnPosition
- 
+     let numberID;
+
      console.log(keyCode)
      for(var row=3;row>-1;row--){  
          for(var column=3;column>-1;column--){
              endColumnPosition=column+relativeColumnIndex
  
+             numberID=gameArray[row][column].uniqid
+
             if(endColumnPosition<0||endColumnPosition>3 ||
              gameArray[row][column].value==0){
                 continue;
  
             }else if(gameArray[row][endColumnPosition].value==0){            
-             assignNumber(row,endColumnPosition,gameArray[row][column].value,gameArray)
-             slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
+             assignNumber(row,endColumnPosition,gameArray[row][column].value,gameArray,numberID)
+            //  slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
              assignZero(row,column,gameArray)
              console.log(gameArray)
  
@@ -679,12 +849,13 @@ export function makeRight(keyCode,moveCount_debugPorpuses){
          }else{
  
              if(gameArray[row][endColumnPosition].value==gameArray[row][column].value && 
+
                  gameArray[row][endColumnPosition].isMergedThisTurn==false &&
                  gameArray[row][column].isMergedThisTurn==false ){
  
-                 assignDoubleNumber(row,endColumnPosition,gameArray)
+                 assignDoubleNumber(row,endColumnPosition,gameArray,gameArray[row][endColumnPosition].uniqid,gameArray[row][column].uniqid)
                  
-                 slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
+                //  slideTileInbrowser(row+""+column,row+""+ endColumnPosition)
  
  
                  assignZero(row,column,gameArray)
@@ -712,8 +883,25 @@ export function makeRight(keyCode,moveCount_debugPorpuses){
  return madeMove
  }
 
+ export function saveCopyPreviousArray(placeWasCalled_debugger){
+    console.log(gameArray)
 
-// {{style=opacity:"0"}}
+
+    console.log(placeWasCalled_debugger)
+
+    for(var row=0;row<4;row++){  
+        for(var column=0;column<4;column++){
+            prevArray[row][column]=JSON.parse(JSON.stringify(gameArray[row][column]))
+// console.log(JSON.parse(JSON.stringify(gameArray[row][column])))
+// console.log(JSON.stringify(gameArray[row][column]))
+        
+}
+        
+    }
+    console.log(JSON.stringify(prevArray))
+    // console.log(prevArray)
+
+}
 
 export function render(row, column) {
     let componentToRender;
@@ -741,10 +929,12 @@ let initialScale=1
         // return 2;
       case 4:
         if(gameArray[row][column].isNew){
-            speedRenderFromExistingComponents=0.5 
+            speedRenderFromExistingComponents=0.5; 
+            initialScale=0.5
           }
         componentToRender=(
-            <Tile4 renderSpeed={speedRenderFromExistingComponents}></Tile4>
+            <Tile4 renderSpeed={speedRenderFromExistingComponents}
+            initialScaleProp={initialScale}></Tile4>
         )
 
         return componentToRender;
