@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion} from "framer-motion";
 
-export const Tile2 = ({renderSpeed,initialScaleProp }) => {
+export const Tile2  = ({renderSpeed,initialScaleProp }) => {
   console.log(renderSpeed)
   console.log(initialScaleProp)
   return (
